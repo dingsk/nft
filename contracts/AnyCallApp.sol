@@ -43,8 +43,12 @@ abstract contract AnyCallApp is Administrable {
     function _anyExecute(uint256 fromChainID, bytes calldata data) internal virtual returns (bool success, bytes memory result);
     function _anyFallback(bytes memory data) internal virtual returns (bool success, bytes memory result);
 
-    function _anyCall(address _to, bytes memory _data, address _fallback, uint256 _toChainID) internal {
-        IAnycallProxy(anyCallProxy).anyCall{value: _anycall_fee}(_to, _data, _fallback, _toChainID, flag);
+    function _anyCall(address _to, bytes memory _data, uint256 _toChainID) internal {
+        if (flag == 2) {
+            IAnycallProxy(anyCallProxy).anyCall(_to, _data, _toChainID, flag, "");
+        } else {
+            IAnycallProxy(anyCallProxy).anyCall{value: _anycall_fee}(_to, _data, _toChainID, flag, "");
+        }
     }
 
     function anyExecute(bytes calldata data) external onlyExecutor returns (bool success, bytes memory result) {

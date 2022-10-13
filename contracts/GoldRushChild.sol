@@ -57,7 +57,7 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
 
     function claimAndFetch(address to, uint256 tokenId) internal {
         bytes memory data = abi.encode(Method_Claim, to, tokenId, true); // mint and fetch
-        _anyCall(peer[mainChain], data, address(0), mainChain);
+        _anyCall(peer[mainChain], data, mainChain);
     }
 
     function Swapout_no_fallback(
@@ -67,7 +67,7 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
     ) public payable {
         _burn(tokenId);
         bytes memory data = abi.encode(Method_Transfer, to, tokenId, false);
-        _anyCall(peer[toChainID], data, address(0), toChainID);
+        _anyCall(peer[toChainID], data, toChainID);
     }
 
     function _anyExecute(uint256 fromChainID, bytes calldata data)
