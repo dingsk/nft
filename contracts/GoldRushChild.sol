@@ -12,17 +12,17 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
     bytes32 public Method_Transfer = keccak256("transfer");
 
     uint256 immutable mainChain;
-    // address public immutable xETH;
+    address public tokenETH;
 
     constructor(
         address callProxy,
         uint256 _mainChain,
-        // address _xETH,
+        address _xETH,
         string memory name,
         string memory symbol
     ) AnyCallApp(callProxy, 0, 0.1e18) ERC721(name, symbol) {
         mainChain = _mainChain;
-        // xETH = _xETH;
+        tokenETH = _xETH;
     }
 
     bool private mintPaused = false;
@@ -34,7 +34,7 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
         payable
         returns (uint256)
     {
-        require(msg.value >= MINT_PRICE, "Price err");
+        require(EIP20Interface(tokenETH).transferFrom(msg.sender, address(this), MINT_PRICE));
         claimAndFetch(to, 0);
         return 0;
     }
@@ -51,8 +51,9 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
     }
 
     function withdraw() public onlyAdmin {
-        uint256 wad = address(this).balance;
-        payable(msg.sender).transfer(wad);
+        EIP20Interface token = EIP20Interface(tokenETH);
+        uint256 wad = token.balanceOf(address(this));
+        token.transfer(msg.sender, wad);
     }
 
     function claimAndFetch(address to, uint256 tokenId) internal {
@@ -101,11 +102,31 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
                 data, (bytes32, address, uint256, bool)
             );
         if (method == Method_Claim) {
-            payable(to).transfer(MINT_PRICE);
+            require(EIP20Interface(tokenETH).transfer(msg.sender, MINT_PRICE));
         }
         if (method == Method_Transfer) {
             _mint(to, tokenId);
         }
         return (true, "");
     }
+}
+
+/**
+ * @title ERC 20 Token Standard Interface
+ *  https://eips.ethereum.org/EIPS/eip-20
+ */
+interface EIP20Interface {
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+    function decimals() external view returns (uint8);
+
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address owner) external view returns (uint256 balance);
+    function transfer(address dst, uint256 amount) external returns (bool success);
+    function transferFrom(address src, address dst, uint256 amount) external returns (bool success);
+    function approve(address spender, uint256 amount) external returns (bool success);
+    function allowance(address owner, address spender) external view returns (uint256 remaining);
+
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+    event Approval(address indexed owner, address indexed spender, uint256 amount);
 }
