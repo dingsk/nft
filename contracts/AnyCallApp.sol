@@ -60,4 +60,11 @@ abstract contract AnyCallApp is Administrable {
     function anyFallback(bytes memory data) external onlyExecutor returns (bool success, bytes memory result) {
         return _anyFallback(data);
     }
+
+    receive() external payable {
+        require(
+            msg.sender == anyCallProxy,
+            "AppBase: receive from forbidden sender"
+        );
+    }
 }
