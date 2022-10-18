@@ -20,7 +20,7 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
         address _xETH,
         string memory name,
         string memory symbol
-    ) AnyCallApp(callProxy, 0, 0.1e18) ERC721(name, symbol) {
+    ) AnyCallApp(callProxy, 4, 0.1e18) ERC721(name, symbol) {
         mainChain = _mainChain;
         tokenETH = _xETH;
     }

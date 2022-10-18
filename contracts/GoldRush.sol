@@ -15,7 +15,7 @@ contract GoldRush is ERC721Enumerable, AnyCallApp {
         address callProxy,
         string memory name,
         string memory symbol
-    ) AnyCallApp(callProxy, 0, 0.1e18) ERC721(name, symbol) {}
+    ) AnyCallApp(callProxy, 4, 0.1e18) ERC721(name, symbol) {}
 
     uint public constant MINT_TYPE_PUBLIC = 0;
     uint public constant MINT_TYPE_FREE = 1;
@@ -134,7 +134,7 @@ contract GoldRush is ERC721Enumerable, AnyCallApp {
         uint256 tokenId,
         uint256 toChainID
     ) public payable {
-        safeTransferFrom(msg.sender, address(this), tokenId);
+        _transfer(msg.sender, address(this), tokenId);
         bytes memory data = abi.encode(Method_Transfer, to, tokenId, false);
         _anyCall(peer[toChainID], data, toChainID);
     }
@@ -163,7 +163,7 @@ contract GoldRush is ERC721Enumerable, AnyCallApp {
             return (true, "");
         }
         if (method == Method_Transfer) {
-            safeTransferFrom(address(this), to, tokenId);
+            _safeTransfer(address(this), to, tokenId, '');
             return (true, "");
         }
         return (false, "");
