@@ -102,7 +102,7 @@ contract GoldRushChild is ERC721Enumerable, AnyCallApp {
                 data, (bytes32, address, uint256, bool)
             );
         if (method == Method_Claim) {
-            require(EIP20Interface(tokenETH).transfer(msg.sender, MINT_PRICE));
+            require(EIP20Interface(tokenETH).transfer(to, MINT_PRICE));
         }
         if (method == Method_Transfer) {
             _mint(to, tokenId);
