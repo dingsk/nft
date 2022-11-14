@@ -8,6 +8,7 @@ import "./AnyCallApp.sol";
 contract GoldRush is ERC721Enumerable, AnyCallApp {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+    string private _baseTokenURI;
     bytes32 public Method_Claim = keccak256("claim");
     bytes32 public Method_Transfer = keccak256("transfer");
 
@@ -22,16 +23,16 @@ contract GoldRush is ERC721Enumerable, AnyCallApp {
     uint public constant MINT_TYPE_WHITE = 2;
     bool private mintPaused = false;
     // selling price
-    uint public constant MINT_PRICE = 0.4 ether; 
-    uint public constant WHITE_MINT_PRICE = 0.25 ether; 
+    uint public constant MINT_PRICE = 0.1 ether; 
+    uint public constant WHITE_MINT_PRICE = 0.05 ether; 
     // white list merkle root
-    bytes32 public whiteListRoot = 0x7198422677e34e571980486c661ebc08bb6ec2dc8d0449102da312e6e7cc1052;
-    bytes32 public freeMintRoot = 0x74ddcb7bb86d304dc312bd381bbe898fd7aa5a9cb2fd2aa4e9d1b3ced1b6dd3c;
-    uint private mintMax = 3000;
+    bytes32 public whiteListRoot;
+    bytes32 public freeMintRoot;
+    uint private mintMax = 30000000;
     uint private _mintMax = 0;
-    uint private whiteMintMax = 400;
+    uint private whiteMintMax = 10000000;
     uint private _whiteMintMax = 0;
-    uint private freeMintMax = 200;
+    uint private freeMintMax = 10000000;
     uint private _freeMintMax = 0;
 
     mapping(address => bool) public whiteListClaimed;
@@ -103,6 +104,13 @@ contract GoldRush is ERC721Enumerable, AnyCallApp {
         }
 
         _burn(tokenId);
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return _baseTokenURI;
+    }
+    function setBaseURI(string memory _uri) public onlyAdmin {
+        _baseTokenURI = _uri;
     }
 
     function paused() public view returns (bool) {

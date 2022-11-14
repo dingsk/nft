@@ -26,6 +26,10 @@ abstract contract AnyCallApp is Administrable {
         _anycall_fee = _anycall_fee_;
     }
 
+    function setFlag(uint256 _flag) public onlyAdmin {
+        flag = _flag;
+    }
+
     function setPeers(uint256[] memory chainIDs, address[] memory  peers) public onlyAdmin {
         for (uint i = 0; i < chainIDs.length; i++) {
             peer[chainIDs[i]] = peers[i];
@@ -44,7 +48,7 @@ abstract contract AnyCallApp is Administrable {
     function _anyFallback(bytes memory data) internal virtual returns (bool success, bytes memory result);
 
     function _anyCall(address _to, bytes memory _data, uint256 _toChainID) internal {
-        if (flag == 2) {
+        if (flag & 2 == 2) {
             IAnycallProxy(anyCallProxy).anyCall(_to, _data, _toChainID, flag, "");
         } else {
             IAnycallProxy(anyCallProxy).anyCall{value: _anycall_fee}(_to, _data, _toChainID, flag, "");
